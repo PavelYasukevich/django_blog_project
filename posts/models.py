@@ -81,3 +81,11 @@ class Comment(models.Model):
         auto_now_add=True,
         help_text="Дата комментирования",
     )
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(User, related_name="follower", on_delete=models.CASCADE)
+    author = models.ForeignKey(User, related_name="following", on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.user.username} follows {self.author.username}'

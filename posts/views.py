@@ -52,13 +52,14 @@ def new_post(request):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    
-    try:
-        Follow.objects.get(user=request.user, author=author)
-        following = True
-    except Follow.DoesNotExist:
-        following = False
-
+    following = False
+    if request.user.is_authenticated:
+        try:
+            Follow.objects.get(user=request.user, author=author)
+            following = True
+        except Follow.DoesNotExist:
+            pass
+     
     post_list = author.posts.all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get("page")
@@ -74,10 +75,11 @@ def post_view(request, username, post_id):
     post = get_object_or_404(Post, id=post_id)
     author = post.author
     comments = post.comments.all()
+    form = CommentForm()
     return render(
         request,
         "posts/view_post.html",
-        {"author": author, "post": post, "items": comments},
+        {"author": author, "post": post, "items": comments, "form": form},
     )
 
 
@@ -137,7 +139,6 @@ def add_comment(request, username, post_id):
 def follow_index(request):
     follow_list = [follow.author for follow in Follow.objects.filter(user=request.user)]
     post_list = Post.objects.filter(author__in=follow_list)
-    # post_list = Post.objects.all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
@@ -150,7 +151,8 @@ def follow_index(request):
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     user = get_object_or_404(User, username=request.user.username)
-    Follow.objects.create(author=author, user=user).save()
+    if author != user and Follow.objects.filter(author=author, user=user).count() == 0:
+        Follow.objects.create(author=author, user=user).save()
     return redirect("profile", username=author.username)
 
 

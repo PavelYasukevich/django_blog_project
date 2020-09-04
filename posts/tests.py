@@ -5,7 +5,7 @@ from django.core.files.images import ImageFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.models import Group, Post
+from posts.models import Comment, Follow, Group, Post
 
 User = get_user_model()
 
@@ -153,12 +153,44 @@ class PostsAppTest(TestCase):
         third_request = self.login_client.get(reverse("index"))
         self.assertIn("cache test", third_request.content.decode("utf-8"))
 
+    def test_follow(self):
+        testuser_to_follow = User.objects.create_user(username="Testuser2")
+        nonfollower = User.objects.create_user(username="Testuser3")
 
-# Создать 1й пост
-# Сделать первый запрос (Страница покажет 1 пост)
-#  Создать 2й пост
-# Сделать второй запрос (Страница покажет все еще 1 пост)
-# 5. Очистить кэш (кстати, а как это правильно сделать, так пойдет?)
-#  from django.core.cache import cache
-#  cache.clear()
-# 6. Сделать опять запрос (Страница на этот раз выведет 2 поста)
+        # Checking that Follow is created
+        self.login_client.get(reverse('profile_follow', args=[testuser_to_follow.username]))
+        self.assertEqual(Follow.objects.count(), 1)
+
+        # Checking that new post appears in follow index if following
+        testpost = Post.objects.create(text="test text", author=testuser_to_follow)
+        testpost.save()
+        response = self.login_client.get(reverse('follow_index'))
+        self.assertIn(testpost.text, response.content.decode("utf-8"))
+
+        # Checking that new post doesn't appear in follow index if not following
+        nonfollower_client = self.client
+        nonfollower_client.force_login(nonfollower)
+        response = nonfollower_client.get(reverse('follow_index'))
+        self.assertNotIn(testpost.text, response.content.decode("utf-8"))
+
+        # Checking that Follow is deleted
+        self.login_client.get(reverse('profile_unfollow', args=[testuser_to_follow.username]))
+        self.assertEqual(Follow.objects.count(), 0)
+
+    def test_commenting_authorized(self):
+        testpost = Post.objects.create(text="test text", author=self.user)
+        testpost.save()
+        url = reverse("add_comment", args=[self.user.username, testpost.id])
+        response = self.login_client.post(
+            url, {"text": "test comment"}, follow=True,
+        )
+        self.assertEqual(Comment.objects.count(), 1)
+
+    def test_commenting_unauthorized(self):
+        testpost = Post.objects.create(text="test text", author=self.user)
+        testpost.save()
+        url = reverse("add_comment", args=[self.user.username, testpost.id])
+        response = self.client.post(
+            url, {"text": "test comment"}, follow=True,
+        )
+        self.assertEqual(Comment.objects.count(), 0)

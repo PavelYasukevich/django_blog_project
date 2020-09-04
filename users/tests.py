@@ -37,7 +37,10 @@ class UsersAppTest(TestCase):
         url = reverse("login")
         response = self.client.post(
             url,
-            {"username": "Testuser", "password": "testpass123",},
+            {
+                "username": "Testuser",
+                "password": "testpass123",
+            },
             follow=True,
         )
         self.assertEqual(response.status_code, 200)

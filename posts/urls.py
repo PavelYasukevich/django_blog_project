@@ -22,6 +22,14 @@ urlpatterns = [
         posts_views.add_comment,
         name="add_comment",
     ),
-    path("<str:username>/follow/", posts_views.profile_follow, name="profile_follow"), 
-    path("<str:username>/unfollow/", posts_views.profile_unfollow, name="profile_unfollow"),
+    path(
+        "<str:username>/follow/",
+        posts_views.profile_follow,
+        name="profile_follow",
+    ),
+    path(
+        "<str:username>/unfollow/",
+        posts_views.profile_unfollow,
+        name="profile_unfollow",
+    ),
 ]

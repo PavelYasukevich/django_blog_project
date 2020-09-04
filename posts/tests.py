@@ -50,7 +50,11 @@ class PostsAppTest(TestCase):
         with open("media/posts/testpic.jpg", "rb") as img:
             response = self.login_client.post(
                 reverse("new_post"),
-                {"text": "test post", "group": self.group.id, "image": img,},
+                {
+                    "text": "test post",
+                    "group": self.group.id,
+                    "image": img,
+                },
                 follow=True,
             )
         self.assertEqual(response.status_code, 200)
@@ -76,7 +80,9 @@ class PostsAppTest(TestCase):
         testpost.save()
         url = reverse("post_edit", args=[self.user.username, testpost.id])
         response = self.login_client.post(
-            url, {"text": "edit test"}, follow=True,
+            url,
+            {"text": "edit test"},
+            follow=True,
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Post.objects.get(id=1).text, "edit test")
@@ -104,7 +110,9 @@ class PostsAppTest(TestCase):
         url = reverse("post_edit", args=[self.user.username, testpost.id])
         edited_text = "editet test text"
         response = self.login_client.post(
-            url, {"text": edited_text, "group": self.group.id}, follow=True,
+            url,
+            {"text": edited_text, "group": self.group.id},
+            follow=True,
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Post.objects.get(id=testpost.id).text, edited_text)
@@ -136,19 +144,19 @@ class PostsAppTest(TestCase):
 
     def test_cached_index_page(self):
         testpost1 = Post.objects.create(
-        text="test text", author=self.user, group=self.group
+            text="test text", author=self.user, group=self.group
         )
         testpost1.save()
         first_request = self.login_client.get(reverse("index"))
 
         testpost2 = Post.objects.create(
-        text="cache test", author=self.user, group=self.group
+            text="cache test", author=self.user, group=self.group
         )
         testpost2.save()
-        
+
         second_request = self.login_client.get(reverse("index"))
         self.assertNotIn("cache test", second_request.content.decode("utf-8"))
-        
+
         cache.clear()
         third_request = self.login_client.get(reverse("index"))
         self.assertIn("cache test", third_request.content.decode("utf-8"))
@@ -158,23 +166,29 @@ class PostsAppTest(TestCase):
         nonfollower = User.objects.create_user(username="Testuser3")
 
         # Checking that Follow is created
-        self.login_client.get(reverse('profile_follow', args=[testuser_to_follow.username]))
+        self.login_client.get(
+            reverse("profile_follow", args=[testuser_to_follow.username])
+        )
         self.assertEqual(Follow.objects.count(), 1)
 
         # Checking that new post appears in follow index if following
-        testpost = Post.objects.create(text="test text", author=testuser_to_follow)
+        testpost = Post.objects.create(
+            text="test text", author=testuser_to_follow
+        )
         testpost.save()
-        response = self.login_client.get(reverse('follow_index'))
+        response = self.login_client.get(reverse("follow_index"))
         self.assertIn(testpost.text, response.content.decode("utf-8"))
 
         # Checking that new post doesn't appear in follow index if not following
         nonfollower_client = self.client
         nonfollower_client.force_login(nonfollower)
-        response = nonfollower_client.get(reverse('follow_index'))
+        response = nonfollower_client.get(reverse("follow_index"))
         self.assertNotIn(testpost.text, response.content.decode("utf-8"))
 
         # Checking that Follow is deleted
-        self.login_client.get(reverse('profile_unfollow', args=[testuser_to_follow.username]))
+        self.login_client.get(
+            reverse("profile_unfollow", args=[testuser_to_follow.username])
+        )
         self.assertEqual(Follow.objects.count(), 0)
 
     def test_commenting_authorized(self):
@@ -182,7 +196,9 @@ class PostsAppTest(TestCase):
         testpost.save()
         url = reverse("add_comment", args=[self.user.username, testpost.id])
         response = self.login_client.post(
-            url, {"text": "test comment"}, follow=True,
+            url,
+            {"text": "test comment"},
+            follow=True,
         )
         self.assertEqual(Comment.objects.count(), 1)
 
@@ -191,6 +207,8 @@ class PostsAppTest(TestCase):
         testpost.save()
         url = reverse("add_comment", args=[self.user.username, testpost.id])
         response = self.client.post(
-            url, {"text": "test comment"}, follow=True,
+            url,
+            {"text": "test comment"},
+            follow=True,
         )
         self.assertEqual(Comment.objects.count(), 0)

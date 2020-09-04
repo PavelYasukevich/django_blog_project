@@ -84,8 +84,16 @@ class Comment(models.Model):
 
 
 class Follow(models.Model):
-    user = models.ForeignKey(User, related_name="follower", on_delete=models.CASCADE)
-    author = models.ForeignKey(User, related_name="following", on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(
+        User, related_name="follower", on_delete=models.CASCADE
+    )
+    author = models.ForeignKey(
+        User,
+        related_name="following",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
-        return f'{self.user.username} follows {self.author.username}'
+        return f"{self.user.username} follows {self.author.username}"

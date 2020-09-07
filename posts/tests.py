@@ -1,5 +1,5 @@
 import io
-from PIL import Image
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -7,10 +7,12 @@ from django.core.files.images import ImageFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
+from PIL import Image
 
 from posts.models import Comment, Follow, Group, Post
 
 User = get_user_model()
+
 
 class PostsAppTest(TestCase):
     def setUp(self):
@@ -28,11 +30,11 @@ class PostsAppTest(TestCase):
 
     @staticmethod
     def create_test_image():
-        img = Image.new('RGB', (50, 50), 'black')
+        img = Image.new("RGB", (50, 50), "black")
         file_obj = io.BytesIO()
-        img.save(file_obj, format='JPEG')
+        img.save(file_obj, format="JPEG")
         file_obj.seek(0)
-        return ImageFile(file_obj, name='testpic')
+        return ImageFile(file_obj, name="testpic")
 
     def content_check(self, testpost):
         places = [
@@ -63,7 +65,7 @@ class PostsAppTest(TestCase):
             {
                 "text": "test post",
                 "group": self.group.id,
-                "image": Image.new('RGB', (50, 50), 'black'),
+                "image": Image.new("RGB", (50, 50), "black"),
             },
             follow=True,
         )
@@ -135,7 +137,7 @@ class PostsAppTest(TestCase):
             {
                 "text": "test post",
                 "group": self.group.id,
-                "image": ImageFile(io.BytesIO(b'not-an-image')),
+                "image": ImageFile(io.BytesIO(b"not-an-image")),
             },
             follow=True,
         )
@@ -143,7 +145,8 @@ class PostsAppTest(TestCase):
             response,
             "form",
             "image",
-            "Загрузите правильное изображение. Файл, который вы загрузили, поврежден или не является изображением.",
+            ("Загрузите правильное изображение. Файл, который вы загрузили, "
+            "поврежден или не является изображением."),
         )
 
     def test_cached_index_page(self):

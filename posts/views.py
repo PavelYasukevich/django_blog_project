@@ -54,8 +54,7 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     if request.user.is_authenticated:
         has_follows = Follow.objects.filter(
-            user=request.user,
-            author=author
+            user=request.user, author=author
         ).exists()
     following = request.user.is_authenticated and has_follows
     post_list = author.posts.all()
@@ -89,10 +88,7 @@ def post_view(request, username, post_id):
 @login_required
 def post_edit(request, username, post_id):
     is_new_post = False
-    post = get_object_or_404(
-        Post.objects.select_related('author'),
-        id=post_id
-    )
+    post = get_object_or_404(Post.objects.select_related("author"), id=post_id)
     author = post.author
     if request.user != author:
         return redirect("post_view", username=author.username, post_id=post.id)
@@ -125,10 +121,7 @@ def server_error(request):
 
 @login_required
 def add_comment(request, username, post_id):
-    post = get_object_or_404(
-        Post.objects.select_related('author'),
-        id=post_id
-    )
+    post = get_object_or_404(Post.objects.select_related("author"), id=post_id)
     author = post.author
     comments = post.comments.all()
     form = CommentForm(request.POST or None)

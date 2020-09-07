@@ -47,7 +47,8 @@ class Post(models.Model):
 
 
 @receiver(post_delete, sender=Post)
-def submission_delete(sender, instance, **kwargs):
+def post_image_delete(sender, instance, **kwargs):
+    """Delete image from server if corresponding Post entry is deleted"""
     instance.image.delete(False)
 
 
@@ -94,6 +95,9 @@ class Follow(models.Model):
         null=True,
         blank=True,
     )
+
+    class Meta:
+        unique_together = ["user", "author"]
 
     def __str__(self):
         return f"{self.user.username} follows {self.author.username}"

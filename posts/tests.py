@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.files.images import ImageFile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase
 from django.urls import reverse
 from PIL import Image
 
@@ -157,6 +157,7 @@ class PostsAppTest(TestCase):
             image=self.create_test_image(),
         )
         first_response = self.login_client.get(reverse("index"))
+        cached_data = first_response.content
 
         testpost2 = Post.objects.create(
             text="cache test",
@@ -166,11 +167,12 @@ class PostsAppTest(TestCase):
         )
 
         second_response = self.login_client.get(reverse("index"))
-        self.assertNotIn("cache test", second_response.content.decode("utf-8"))
+        self.assertEqual(first_response.content, second_response.content)
 
         cache.clear()
         third_response = self.login_client.get(reverse("index"))
-        self.assertIn("cache test", third_response.content.decode("utf-8"))
+        self.assertNotEqual(first_response.content, third_response.content)
+
 
     def test_follow(self):
         testuser_to_follow = User.objects.create_user(username="Testuser2")
@@ -186,15 +188,14 @@ class PostsAppTest(TestCase):
         testpost = Post.objects.create(
             text="test text", author=testuser_to_follow
         )
-        testpost.save()
         response = self.login_client.get(reverse("follow_index"))
-        self.assertIn(testpost.text, response.content.decode("utf-8"))
+        self.assertEqual(response.context.get("paginator").count, 1)
 
         # Checking that new post doesn't appear in follow index if not following
         nonfollower_client = self.client
         nonfollower_client.force_login(nonfollower)
         response = nonfollower_client.get(reverse("follow_index"))
-        self.assertNotIn(testpost.text, response.content.decode("utf-8"))
+        self.assertEqual(response.context.get("paginator").count, 0)
 
         # Checking that Follow is deleted
         self.login_client.get(

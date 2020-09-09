@@ -29,7 +29,7 @@ def group_posts(request, slug):
 
     return render(
         request,
-        "group.html",
+        "posts/group.html",
         {"group": group, "page": page, "paginator": paginator},
     )
 

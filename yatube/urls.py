@@ -11,25 +11,31 @@ urlpatterns = [
     path("404", posts_views.page_not_found),
     path("500", posts_views.server_error),
     path("admin/", admin.site.urls),
-    path("", posts_views.index, name="index"),
-    path("", include("posts.urls")),
     path("about/", include("django.contrib.flatpages.urls")),
     path("auth/", include("users.urls")),
     path("auth/", include("django.contrib.auth.urls")),
+    path("", posts_views.index, name="index"),
+    path("", include("posts.urls")),
 ]
 
 urlpatterns += [
     path(
-        "about-author/",
+        "about/about-author/",
         flatpages_views.flatpage,
         {"url": "/about-author/"},
         name="about_author",
     ),
     path(
-        "about-spec/",
+        "about/about-spec/",
         flatpages_views.flatpage,
         {"url": "/about-spec/"},
         name="about_spec",
+    ),
+    path(
+        "about/contacts/",
+        flatpages_views.flatpage,
+        {"url": "/abou-contacts/"},
+        name="contacts",
     ),
     # path('terms/', flatpages_views.flatpage, {'url': '/terms/'}, name='terms'),
 ]
@@ -38,9 +44,12 @@ handler404 = "posts.views.page_not_found"  # noqa
 handler500 = "posts.views.server_error"  # noqa
 
 if settings.DEBUG:
+    import debug_toolbar
+
     urlpatterns += static(
         settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
     )
     urlpatterns += static(
         settings.STATIC_URL, document_root=settings.STATIC_ROOT
     )
+    urlpatterns += (path("__debug__/", include(debug_toolbar.urls)),)

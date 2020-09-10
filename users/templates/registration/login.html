@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="row justify-content-center">
-        <div class="col-md-8 p-5">
+        <div class="col-md-10 p-5">
             <div class="card">
                 <div class="card-header">Войти на сайт</div>
                 <div class="card-body">
@@ -15,7 +15,7 @@
                     {% endif %}
                     {% if next %}
                         <div class="alert alert-info" role="alert">
-                            Вы обратились к странице, доступ к которой возможен только для залогиненных пользователей.<br>
+                            Вы обратились к странице, доступ к которой возможен только для авторизованных пользователей.<br>
                             Пожалуйста, авторизуйтесь.
                         </div>
                     {% else %}
@@ -42,13 +42,12 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 offset-md-4">
-                            <button type="submit" class="btn btn-primary">
-                                Войти
-                            </button>
-                            <a href="{% url 'password_reset' %}" class="btn btn-link">
-                                Забыли пароль?
-                            </a>
+                        <div class="form-group row">
+                            <div class="col-md-8 offset-md-4">
+                                <button type="submit" class="btn btn-primary">Войти</button>
+                                <a href="{% url 'password_reset' %}" class="btn btn-link">Забыли пароль?</a>
+                                <a href="{% url 'signup' %}" class="btn btn-link">Нет учетной записи?</a>
+                            </div>
                         </div>
                     </form>
                 </div>

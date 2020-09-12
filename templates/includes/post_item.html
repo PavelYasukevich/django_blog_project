@@ -1,3 +1,4 @@
+{% load tz %}
 <div class="card mb-3 mt-1 shadow-sm">
     {% load thumbnail %}
     {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
@@ -19,10 +20,17 @@
         
         <div class="d-flex justify-content-between align-items-center">
             <div class="btn-group ">
-                <a class="btn btn-sm text-muted" href="{% url 'add_comment' post.author.username post.id %}" role="button">
-                    {% if post.comments.exists %}
+                <a class="btn btn-sm text-muted"
+                    href={% if request.resolver_match.url_name != "post_view" %}
+                            "{% url 'post_view' post.author.username post.id %}"
+                        {% else %}
+                            "{% url 'add_comment' post.author.username post.id %}"
+                        {% endif %}
+                    role="button">
+
+                    {% if post.comments.exists and request.resolver_match.url_name != "post_view" %}
                     Комментариев: {{ post.comments.count }} 
-                    {% else%}
+                    {% else %}
                     Добавить комментарий
                     {% endif %}
                 </a>
@@ -34,7 +42,7 @@
                 </a>
                 {% endif %}
             </div>
-            <small class="text-muted">{{ post.pub_date }}</small>
+            <small class="text-muted">{{ post.pub_date|localtime }}</small>
         </div>
     </div>
 </div>

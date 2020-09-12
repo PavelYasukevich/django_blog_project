@@ -37,7 +37,6 @@ urlpatterns += [
         {"url": "/abou-contacts/"},
         name="contacts",
     ),
-    # path('terms/', flatpages_views.flatpage, {'url': '/terms/'}, name='terms'),
 ]
 
 handler404 = "posts.views.page_not_found"  # noqa

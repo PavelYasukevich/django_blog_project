@@ -19,6 +19,7 @@
 </div>
 {% endif %}
 
+<h3>Комментарии:</h3><hr>
 {% for item in items %}
 <div class="media mb-4">
     <div class="media-body">
@@ -30,6 +31,7 @@
         </h5>
         {{ item.text }}
     </div>
+    <small class="text-muted">{{ item.created }}</small>
 </div>
 <hr>
 {% endfor %}

@@ -3,7 +3,6 @@ env/
 venv/
 .venv
 .venv/
-.env
 
 
 __pycache__/
@@ -17,9 +16,10 @@ __pycache__/
 *.sublime-project
 *.sublime-workspace
 
-# static/
+static/
 posts/static/
-# media/
+media/
 
 db.sqlite3
 db_backup/
+.env

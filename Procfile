@@ -1,1 +1,0 @@
-web: gunicorn yatube.wsgi

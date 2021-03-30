@@ -24,3 +24,4 @@ sent_emails/
 db.sqlite3
 db_backup/
 .env
+.vscode

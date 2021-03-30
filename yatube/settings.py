@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-DEBUG = TEMPLATE_DEBUG = os.environ.get('DEBUG')
+DEBUG = TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -63,12 +63,12 @@ WSGI_APPLICATION = "yatube.wsgi.application"
 
 DB = {
     "postgres": {
-        "ENGINE": os.environ.get('DB_ENGINE'),
+        "ENGINE": 'django.db.backends.postgresql',
         "NAME": os.environ.get('DB_NAME'),
         "HOST": os.environ.get('DB_HOST'),
         "PORT": os.environ.get('DB_PORT'),
         "USER": os.environ.get('DB_USER'),
-        "PASSWORD": os.environ.get('PSQL_pass'),
+        "PASSWORD": os.environ.get('DB_PASSWORD'),
     },
     "sqlite": {
         "ENGINE": "django.db.backends.sqlite3",
